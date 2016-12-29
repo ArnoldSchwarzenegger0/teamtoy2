@@ -1,0 +1,126 @@
+<style type="text/css">
+	thead{ padding:5px; color:#6CA1B4; font-weight:700; background-color:#353535; }
+	td,th{ padding-left: 3px; text-align: left;  }
+	table{ width: 100%; }
+</style>
+<h2 class="main_board"><?=__('TEST_PAGE_TITLE')?></h2>
+<?=$data[0]['name']?>
+<!-- <form action="?c=test&a=Derived_Excel" method="post" onsubmit="return getexecl();">
+	<select name='template' id='ex'>
+		<option value="0">请选择模版</option>
+		<?php foreach ($data['tpl'] as $value): ?>
+			<option value='<?=$value?>'><?=$value?></option>
+		<?php endforeach; ?>
+	</select>
+	<input type="submit" name="btn_exp" value="导出">
+</form> -->
+<form action="?c=test&a=Derived_Excel" method="post" onsubmit="return getexecl();">
+<select name='template' id='ex'>
+		<option value="0">请选择模版</option>
+		<?php foreach ($data['tpl'] as $value): ?>
+			<option value='<?=$value?>'><?=$value?></option>
+		<?php endforeach; ?>
+	</select>
+	<input type="text" onchange="test()" name="date" class="text input-large time" value="" placeholder="请选择时间" />
+	<input type="submit" id='btn' value="导出">
+	<div onchange="test()"><?=$data['aa'] ?></div>
+	<div id='div1'><?=$data['tip'] ?></div>
+	<table id='info'>
+		<thead>
+		    <tr>
+		        <th>员工卡号</th>
+		        <th>姓名</th>
+				<th>日期</th>
+		        <th>原因</th>
+		    </tr>
+		</thead>
+		<tbody>
+			<?php if(!empty($data['arr'])): ?>
+				<?php foreach($data['arr'] as $value): ?>
+					<tr>
+						<td><?=$value['eid'] ?></td>
+						<td><?=$value['name'] ?></td>
+						<td><?=$value['start_date'] ?></td>
+						<td><?=$value['centent'] ?></td>
+					</tr>
+				<?php endforeach; ?>
+			<?php else: ?>
+				<tr>
+					<td><?=$data['tip'] ?></td>
+				</tr>
+			<?php endif ?>
+		</tbody>
+	</table>
+</form>
+<link href="static/script/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
+<link href="static/script/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="static/script/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="static/script/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+<script type="text/javascript">
+	$(function(){
+		if(<?=empty($data['arr']) ?>){
+			$('#btn').hide();
+		}
+		$('.time').datetimepicker({
+			format:'yyyy-mm',
+			language:"zh-CN",
+		    startView: 3,
+		    minView: 3,
+		    autoclose:true
+		});
+	});
+	function getexecl() {
+		var f_name=document.getElementById('ex').value;
+		if(f_name!=0){
+			return true;
+		}else{
+			alert('请选择模版！');
+			return false;
+		}
+	}
+	function test() {
+		// var str1='未打卡考勤特殊说明';
+		// $('#div1').html($('.time').val());
+		// $('#div1').html($('#ex').val());
+		if(getexecl()){
+			$.post(
+			'?c=test&a=Derived_Excel',
+			{
+				template:$('#ex').val(),
+				date:$('.time').val(),
+				flg:'1'
+			},
+			function(data){
+				var str='';
+				var t_title='';
+				if($('#ex').val().indexOf('未打卡')<0){
+					t_title="<tr><th>加班人卡号</th><th>加班人姓名</th><th>加班日期</th><th>加班时间</th><th>加班工时</th><th>加班类型</th><th>加班原因</th></tr>";
+				}else{
+					t_title="<tr><th>员工卡号</th><th>姓名</th><th>日期</th><th>原因</th></tr>";
+				}
+				if(data=='[]'){
+					str='aOh! 暂时还没有内容!';
+					$('#btn').hide();
+				}else{
+					$('#btn').show();
+					var arr=JSON.parse(data);
+					if($('#ex').val().indexOf('未打卡')<0){
+						$('#info thead').html(t_title);
+						$(arr).each(function(key){
+							str+="<tr><td>"+arr[key].eid+"</td><td>"+arr[key].name+"</td><td>"+arr[key].date+"</td><td>"+arr[key].start_date+"~~"+arr[key].end_date+"</td><td>"+arr[key].overtime_hours+"</td><td>"+arr[key].overtime_type+"</td><td>"+arr[key].centent+"</td></tr>";
+						});
+					}else{
+						$('#info thead').html(t_title);
+						$(arr).each(function(key){
+							str+="<tr><td>"+arr[key].eid+"</td><td>"+arr[key].name+"</td><td>"+arr[key].start_date+"</td><td>"+arr[key].centent+"</td></tr>";
+						});
+					}
+				}
+				$('#info tbody').html(str);
+			});
+		}else{
+			$('.time').val('');
+		}
+	}
+</script>

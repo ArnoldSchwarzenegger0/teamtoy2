@@ -1,0 +1,35 @@
+<form method="post" action="?c=attendance&a=uploadexcelfile" enctype="multipart/form-data">
+	<fieldset>
+	    <h3>上传Excel考勤表：</h3>
+	    <span>请选择考勤月份</span>
+		<input type="month" name="date" id='date'/><br/>
+		<input  type="file" id='file'  name="file_stu[]" multiple accept=".xlsx" />
+	    <input type="submit"  value="上传" />
+	</fieldset>
+</form>
+<form method="post" action="?c=attendance&a=downloadexcelfile">
+	<fieldset>
+	    <h3>下载Excel考勤表：</h3>
+	    <span>请选择考勤月份</span>
+		<input type="month" name="date" id='time'/><br/>
+		<span>请选择组别</span>
+		<dir>
+			<div style="width: 442px; border: 1px solid blue; margin-bottom: 10px;">
+				<input type="radio" value="all" name="group">全体员工
+			</div>
+			<?php foreach ($data as $key => $value): ?>
+				<?php $i=0; ?>
+				<div style="float: left; border: 1px solid blue; margin-right: 10px;">
+					<input type="radio" name="group" value="<?=$key?>"><?=$key?><br/>
+					<?php foreach ($data[$key] as $k => $v): ?>
+						<?php if(($i++)%5==0): ?>
+						<br/>
+						<?php endif ?>
+						<?=$v ?>
+					<?php endforeach ?>
+				</div>
+			<?php endforeach ?>
+		</dir>
+	    <input type="submit"  value="下载" />
+	</fieldset>
+</form>
